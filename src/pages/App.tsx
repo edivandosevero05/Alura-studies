@@ -1,49 +1,48 @@
-import React, { useState } from 'react';
-import Cronometro from '../components/Cronometro';
-import Formulario from '../components/Formulario';
-import Lista from '../components/Lista';
-import { ITarefa } from '../types/tarefa';
-import style from './App.module.scss';
+import { useState } from "react";
+import Form from "../components/Form";
+import List from "../components/List";
+import Timer from "../components/Timer";
+import { ITask } from "../Types/Task";
+import style from "./App.module.scss";
 
 function App() {
-  const [tarefas, setTarefas] = useState<ITarefa[]>([]);
-  const [selecionado, setSelecionado] = useState<ITarefa>();
+  const [tasks, setTasks] = useState<ITask[]>([]);
+  const [selected, setSelected] = useState<ITask>();
 
-  function selecionaTarefa(tarefaSelecionada: ITarefa) {
-    setSelecionado(tarefaSelecionada);
-    setTarefas(tarefasAnteriores => tarefasAnteriores.map(tarefa => ({
-      ...tarefa,
-      selecionado: tarefa.id === tarefaSelecionada.id ? true : false
-    })))
+  function selectTask(taskSelected: ITask) {
+    setSelected(taskSelected);
+    setTasks((tasks) =>
+      tasks.map((task) => ({
+        ...task,
+        selected: taskSelected.id === task.id ? true : false,
+      }))
+    );
   }
 
-  function finalizarTarefa() {
-    if(selecionado) {
-      setSelecionado(undefined);
-      setTarefas(tarefasAnteriores => tarefasAnteriores.map(tarefa => {
-        if(tarefa.id === selecionado.id) {
-          return {
-            ...tarefa,
-            selecionado: false,
-            completado: true
+  function terminateTask() {
+    if (selected) {
+      setSelected(undefined);
+      setTasks((tasks) =>
+        tasks.map((task) => {
+          if (task.id === selected.id) {
+            return {
+              ...task,
+              selected: false,
+              completed: true,
+            };
+          } else {
+            return task;
           }
-        }
-        return tarefa;
-      }))
+        })
+      );
     }
   }
 
   return (
     <div className={style.AppStyle}>
-      <Formulario setTarefas={setTarefas} />
-      <Lista
-        tarefas={tarefas}
-        selecionaTarefa={selecionaTarefa}
-      />
-      <Cronometro
-        selecionado={selecionado}
-        finalizarTarefa={finalizarTarefa}
-      />
+      <Form setTasks={setTasks} />
+      <List tasks={tasks} selectTask={selectTask} />
+      <Timer selected={selected} terminateTask={terminateTask} />
     </div>
   );
 }
